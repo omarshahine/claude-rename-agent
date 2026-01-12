@@ -1,0 +1,6 @@
+claude-agent-sdk>=0.1.0
+pymupdf>=1.24.0
+pillow>=10.0.0
+python-magic>=0.4.27
+rich>=13.0.0
+typer>=0.12.0
