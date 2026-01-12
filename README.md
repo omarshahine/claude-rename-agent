@@ -2,6 +2,8 @@
 
 An AI-powered file renaming agent built with the Claude Agent SDK. It analyzes documents, classifies them, and applies consistent naming patterns that are learned and remembered over time.
 
+![Rename Agent Screenshot](assets/screenshot.png)
+
 ## Features
 
 - **Document Analysis**: Reads PDFs, images, and text files to understand content
