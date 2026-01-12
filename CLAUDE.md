@@ -1,10 +1,70 @@
 # Rename Agent
 
-An AI-powered file renaming agent built with the Claude Agent SDK.
+An AI-powered file renaming agent that analyzes documents, classifies them, and applies consistent naming patterns.
 
-## Project Overview
+## When to Use
 
-This agent analyzes documents (PDFs, images, text files), classifies them by type, and applies consistent naming patterns. It learns patterns over time for reuse.
+Use rename-agent when users ask to:
+- Rename files based on their content
+- Organize documents with consistent naming
+- Process batches of PDFs, images, or text files
+- Apply naming patterns like `{Date} - {Merchant}` or `{Year} - {Form Type}`
+
+## Commands
+
+```bash
+# Preview files in a folder
+rename-agent preview /path/to/folder
+
+# Process files with the AI agent
+rename-agent --files /path/to/documents
+
+# Use a specific naming pattern
+rename-agent --files /path/to/receipts --pattern "{Date:YYYY-MM-DD} - {Merchant}"
+
+# Dry run (preview without renaming)
+rename-agent --files /path/to/docs --dry-run
+
+# View learned patterns
+rename-agent patterns
+
+# View rename history
+rename-agent history
+
+# View statistics
+rename-agent stats
+
+# List supported document types
+rename-agent types
+```
+
+## Pattern Tokens
+
+Available tokens for naming patterns:
+- `{Date:YYYY-MM-DD}` - Full date (2024-03-15)
+- `{Date:YYYY-MM}` - Year and month (2024-03)
+- `{Date:YYYY}` or `{Year}` - Year only (2024)
+- `{Merchant}` - Business/vendor name
+- `{Amount}` - Dollar amount
+- `{Institution}` - Organization name
+- `{Bank Name}` - Bank name
+- `{Form Type}` - Tax form type (1099, W-2, K-1)
+- `{Account Number}` - Full account number
+- `{Last 4 Digits}` - Last 4 of account
+- `{Description}` - Document description
+- `{Title}` - Document title
+
+## Document Types
+
+Receipt, Bill, Tax Document, Bank Statement, Invoice, Contract, Medical, Insurance, Investment, Payslip, Identity, Correspondence, Manual, Photo, General
+
+## Data Storage
+
+Patterns and history are stored in `~/.rename-agent/`
+
+---
+
+# Development
 
 ## Key Files
 

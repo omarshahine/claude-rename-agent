@@ -11,6 +11,14 @@ import os
 from pathlib import Path
 from typing import Any, Optional
 
+from rich.console import Console
+from rich.markdown import Markdown
+from rich.panel import Panel
+from rich.text import Text
+from rich.live import Live
+from rich.spinner import Spinner
+from rich.style import Style
+
 from claude_agent_sdk import (
     query,
     ClaudeAgentOptions,
@@ -21,6 +29,9 @@ from claude_agent_sdk import (
     TextBlock,
     ToolUseBlock,
 )
+
+# Rich console for styled output
+console = Console()
 
 from .tools.file_analyzer import (
     analyze_file,
@@ -440,9 +451,12 @@ async def run_rename_agent(
         if isinstance(message, AssistantMessage):
             for block in message.content:
                 if isinstance(block, TextBlock):
-                    print(block.text)
+                    # Render markdown for rich text output
+                    console.print(Markdown(block.text))
                 elif isinstance(block, ToolUseBlock):
-                    print(f"[Using tool: {block.name}]")
+                    # Styled tool usage indicator
+                    tool_name = block.name.replace("mcp__rename__", "")
+                    console.print(f"  [dim]●[/dim] [green]{tool_name}[/green]", end=" ")
 
 
 async def run_interactive_session(
@@ -485,36 +499,49 @@ async def run_interactive_session(
         permission_mode=permission_mode,
     )
 
-    print("Rename Agent - Interactive Session")
-    print("Type 'quit' or 'exit' to end the session")
-    print("-" * 50)
-
     async with ClaudeSDKClient(options=options) as client:
         while True:
             try:
-                user_input = input("\nYou: ").strip()
+                # Styled prompt
+                console.print()
+                user_input = console.input("[green]>[/green] ").strip()
 
-                if user_input.lower() in ("quit", "exit", "q"):
-                    print("Goodbye!")
+                # Handle commands
+                if user_input.lower() in ("quit", "exit", "q", "/quit", "/exit"):
+                    console.print()
+                    console.print("[dim]Goodbye![/dim]")
                     break
+
+                if user_input.lower() in ("/help", "help"):
+                    console.print()
+                    console.print("  [dim]Commands:[/dim]")
+                    console.print("    [green]/stats[/green]   - Show pattern statistics")
+                    console.print("    [green]/history[/green] - Show rename history")
+                    console.print("    [green]/quit[/green]    - Exit the agent")
+                    continue
 
                 if not user_input:
                     continue
 
                 await client.query(user_input)
 
+                console.print()
                 async for message in client.receive_response():
                     if isinstance(message, AssistantMessage):
                         for block in message.content:
                             if isinstance(block, TextBlock):
-                                print(f"\nAssistant: {block.text}")
+                                # Render markdown for rich text
+                                console.print(Markdown(block.text))
                             elif isinstance(block, ToolUseBlock):
-                                print(f"[Using: {block.name}]")
+                                # Styled tool usage indicator
+                                tool_name = block.name.replace("mcp__rename__", "")
+                                console.print(f"  [dim]●[/dim] [green]{tool_name}[/green]", end=" ")
 
             except KeyboardInterrupt:
-                print("\nInterrupted. Type 'quit' to exit.")
+                console.print()
+                console.print("[dim]Interrupted. Type /quit to exit.[/dim]")
             except Exception as e:
-                print(f"\nError: {e}")
+                console.print(f"\n[red]Error:[/red] {e}")
 
 
 def main():

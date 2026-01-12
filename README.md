@@ -11,44 +11,33 @@ An AI-powered file renaming agent built with the Claude Agent SDK. It analyzes d
 - **Batch Processing**: Process multiple files at once with consistent naming
 - **History Tracking**: Keeps track of all renames for reference
 
-## Prerequisites
-
-1. **Python 3.10+** - macOS users may need to install via Homebrew:
-   ```bash
-   brew install python@3.11
-   ```
-
-2. **Install Claude Code** (the SDK runtime):
-   ```bash
-   # macOS/Linux
-   curl -fsSL https://claude.ai/install.sh | bash
-
-   # Or via Homebrew
-   brew install --cask claude-code
-
-   # Or via npm
-   npm install -g @anthropic-ai/claude-code
-   ```
-
-3. **Install the Claude Agent SDK**:
-   ```bash
-   pip3.11 install claude-agent-sdk
-   ```
-
-4. **Set your API key**:
-   ```bash
-   export ANTHROPIC_API_KEY=your-api-key
-   ```
-
-## Installation
+## Quick Install
 
 ```bash
-# Clone or navigate to the project
-cd /path/to/rename-agent
-
-# Install the package
-pip3.11 install -e .
+curl -fsSL https://raw.githubusercontent.com/omarshahine/claude-rename-agent/main/install.sh | bash
 ```
+
+Or install via pip:
+
+```bash
+pip install claude-rename-agent
+```
+
+## Prerequisites
+
+- **Python 3.10+**
+- **Claude Code** - [Install Claude Code](https://claude.ai/code) first
+- **Anthropic API Key** - Set `ANTHROPIC_API_KEY` environment variable
+
+<details>
+<summary>Manual Installation</summary>
+
+1. Install Python 3.10+ (macOS: `brew install python@3.11`)
+2. Install Claude Code: `curl -fsSL https://claude.ai/install.sh | bash`
+3. Install the SDK: `pip3 install claude-agent-sdk`
+4. Install Rename Agent: `pip3 install claude-rename-agent`
+
+</details>
 
 ## Usage
 

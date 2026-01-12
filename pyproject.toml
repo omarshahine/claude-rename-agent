@@ -1,9 +1,27 @@
 [project]
-name = "rename-agent"
+name = "claude-rename-agent"
 version = "0.1.0"
 description = "AI-powered file renaming agent using Claude Agent SDK with pattern learning"
 readme = "README.md"
+license = "MIT"
 requires-python = ">=3.10"
+authors = [
+    { name = "Omar Shahine", email = "omar@shahine.com" }
+]
+keywords = ["claude", "ai", "agent", "file-renaming", "document-management", "automation"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Utilities",
+    "Topic :: Office/Business",
+]
 dependencies = [
     "claude-agent-sdk>=0.1.0",
     "pymupdf>=1.24.0",
@@ -12,6 +30,11 @@ dependencies = [
     "rich>=13.0.0",
     "typer>=0.12.0",
 ]
+
+[project.urls]
+Homepage = "https://github.com/omarshahine/claude-rename-agent"
+Repository = "https://github.com/omarshahine/claude-rename-agent"
+Issues = "https://github.com/omarshahine/claude-rename-agent/issues"
 
 [project.scripts]
 rename-agent = "rename_agent.cli:app"

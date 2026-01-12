@@ -20,6 +20,8 @@ from rich.console import Console
 from rich.table import Table
 from rich.panel import Panel
 from rich.markdown import Markdown
+from rich.text import Text
+from rich.style import Style
 
 from .agent import run_rename_agent, run_interactive_session
 from .tools.pattern_manager import (
@@ -39,6 +41,44 @@ app = typer.Typer(
 )
 console = Console()
 
+# Branding colors (Claude-like green accent)
+ACCENT_COLOR = "green"
+DIM_COLOR = "dim"
+
+BANNER = r"""
+  ██████╗ ███████╗███╗   ██╗ █████╗ ███╗   ███╗███████╗
+  ██╔══██╗██╔════╝████╗  ██║██╔══██╗████╗ ████║██╔════╝
+  ██████╔╝█████╗  ██╔██╗ ██║███████║██╔████╔██║█████╗
+  ██╔══██╗██╔══╝  ██║╚██╗██║██╔══██║██║╚██╔╝██║██╔══╝
+  ██║  ██║███████╗██║ ╚████║██║  ██║██║ ╚═╝ ██║███████╗
+  ╚═╝  ╚═╝╚══════╝╚═╝  ╚═══╝╚═╝  ╚═╝╚═╝     ╚═╝╚══════╝
+                       AGENT
+
+  AI-powered file renaming with pattern learning
+"""
+
+
+def print_banner():
+    """Print the styled welcome banner."""
+    console.print()
+    # Split and skip empty first/last lines, but preserve indentation
+    lines = BANNER.split('\n')
+    for line in lines[1:-1]:  # Skip first empty line and last empty line
+        console.print(Text(line, style=Style(color="green")))
+    console.print("  " + "─" * 54, style="dim")
+
+
+def print_help_hint():
+    """Print helpful hints for the user."""
+    console.print()
+    console.print(f"  [dim]Type your request, or try:[/dim]")
+    console.print(f"    [green]•[/green] [white]Rename these files in ~/Downloads[/white]")
+    console.print(f"    [green]•[/green] [white]Process my tax documents with pattern {{Year}} - {{Form Type}}[/white]")
+    console.print(f"    [green]•[/green] [white]Show me what patterns I have saved[/white]")
+    console.print()
+    console.print(f"  [dim]Commands: [green]/help[/green] [green]/stats[/green] [green]/history[/green] [green]/quit[/green][/dim]")
+    console.print()
+
 
 def get_data_dir(data_dir: Optional[str] = None) -> str:
     """Get the data directory path."""
@@ -47,8 +87,9 @@ def get_data_dir(data_dir: Optional[str] = None) -> str:
     return str(Path.home() / ".rename-agent")
 
 
-@app.command()
+@app.callback(invoke_without_command=True)
 def main(
+    ctx: typer.Context,
     prompt: Optional[str] = typer.Argument(
         None,
         help="The renaming task to perform. If not provided, starts interactive mode.",
@@ -94,12 +135,16 @@ def main(
 
         rename-agent
 
-        rename-agent "Rename these K-1 tax forms" --files /path/to/forms
+        rename-agent "Rename these 1099 tax forms" --files /path/to/forms
 
         rename-agent --files /path/to/receipts --pattern "{Date:YYYY-MM-DD} - {Merchant}"
 
-        rename-agent --stats
+        rename-agent stats
     """
+    # If a subcommand was invoked, don't run main
+    if ctx.invoked_subcommand is not None:
+        return
+
     # Initialize data directory
     data_path = get_data_dir(data_dir)
     set_store(PatternStore(data_path))
@@ -131,16 +176,14 @@ def main(
 
     if prompt:
         # Run with the provided prompt
-        console.print(Panel(f"[bold]Task:[/bold] {prompt}", title="Rename Agent"))
+        console.print()
+        console.print(f"  [green]>[/green] [bold]{prompt}[/bold]")
+        console.print()
         asyncio.run(run_rename_agent(prompt, data_path, permission_mode))
     else:
         # Interactive mode
-        console.print(Panel(
-            "[bold]Rename Agent[/bold] - Interactive Mode\n\n"
-            "I can help you rename and organize your files with consistent naming patterns.\n"
-            "Tell me what files you'd like to rename, or drop a folder path.",
-            title="Welcome",
-        ))
+        print_banner()
+        print_help_hint()
         asyncio.run(run_interactive_session(data_path, permission_mode))
 
 
