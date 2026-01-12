@@ -63,7 +63,7 @@ This starts an interactive session where you can describe what you want to renam
 ### Single Command
 
 ```bash
-rename-agent "Rename these K-1 tax forms for 2024" --files /path/to/forms
+rename-agent "Rename these 1099 tax forms for 2024" --files /path/to/forms
 ```
 
 ### Process a Folder
@@ -169,8 +169,8 @@ Use `--data-dir` to specify a custom location.
 ### Rename Tax Documents
 
 ```bash
-rename-agent "Rename all K-1 forms using the pattern {Year} - K-1 - {Institution}" \
-  --files ~/Documents/Tax/2024/K1s
+rename-agent "Rename all 1099 forms using the pattern {Year} - 1099 - {Institution}" \
+  --files ~/Documents/Tax/2024/1099s
 ```
 
 ### Process Bank Statements
