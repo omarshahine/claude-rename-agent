@@ -37,16 +37,16 @@ Copy the skill to your Claude Code skills directory:
 # Create the skills directory if it doesn't exist
 mkdir -p ~/.claude/skills
 
-# Copy the rename skill
-cp -r .claude/skills/rename ~/.claude/skills/
+# Copy the rename-agent skill
+cp -r .claude/skills/rename-agent ~/.claude/skills/
 ```
 
 Or download directly:
 
 ```bash
-mkdir -p ~/.claude/skills/rename
-curl -fsSL https://raw.githubusercontent.com/omarshahine/claude-rename-agent/main/.claude/skills/rename/SKILL.md \
-  -o ~/.claude/skills/rename/SKILL.md
+mkdir -p ~/.claude/skills/rename-agent
+curl -fsSL https://raw.githubusercontent.com/omarshahine/claude-rename-agent/main/.claude/skills/rename-agent/SKILL.md \
+  -o ~/.claude/skills/rename-agent/SKILL.md
 ```
 
 ### Use It
