@@ -51,7 +51,16 @@ curl -fsSL https://raw.githubusercontent.com/omarshahine/claude-rename-agent/mai
 
 ### Use It
 
-Once the skill is added, just ask Claude Code to rename your files:
+Once the skill is added, you can use it in two ways:
+
+**Slash command** - Type `/rename-agent` to explicitly invoke the skill:
+
+```
+> /rename-agent
+> /rename-agent ~/Downloads/tax-forms
+```
+
+**Natural language** - Just describe what you want to rename. Claude will automatically detect when to use the skill based on your request:
 
 ```
 > Rename these tax documents in ~/Downloads/tax-forms
@@ -59,7 +68,7 @@ Once the skill is added, just ask Claude Code to rename your files:
 > Batch rename PDFs in /path/to/folder using pattern {Date} - {Title}
 ```
 
-Claude will automatically use the rename skill, check if the tool is installed, help you set it up if needed, and process your files.
+The skill will check if rename-agent is installed and help you set it up if needed.
 
 ## Prerequisites
 
