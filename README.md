@@ -25,6 +25,42 @@ Or install via pip:
 pip install claude-rename-agent
 ```
 
+## Claude Code Integration
+
+Add the rename skill to Claude Code and just ask Claude to rename your files. The skill will check if rename-agent is installed and help you set it up if needed.
+
+### Add the Skill
+
+Copy the skill to your Claude Code skills directory:
+
+```bash
+# Create the skills directory if it doesn't exist
+mkdir -p ~/.claude/skills
+
+# Copy the rename skill
+cp -r .claude/skills/rename ~/.claude/skills/
+```
+
+Or download directly:
+
+```bash
+mkdir -p ~/.claude/skills/rename
+curl -fsSL https://raw.githubusercontent.com/omarshahine/claude-rename-agent/main/.claude/skills/rename/SKILL.md \
+  -o ~/.claude/skills/rename/SKILL.md
+```
+
+### Use It
+
+Once the skill is added, just ask Claude Code to rename your files:
+
+```
+> Rename these tax documents in ~/Downloads/tax-forms
+> Organize my receipts in ~/Documents/Receipts with date and merchant
+> Batch rename PDFs in /path/to/folder using pattern {Date} - {Title}
+```
+
+Claude will automatically use the rename skill, check if the tool is installed, help you set it up if needed, and process your files.
+
 ## Prerequisites
 
 - **Python 3.10+**
