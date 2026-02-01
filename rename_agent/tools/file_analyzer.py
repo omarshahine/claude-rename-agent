@@ -87,6 +87,7 @@ def extract_pdf_text(file_path: str, max_pages: int = 3, max_chars: int = 30000)
         doc = fitz.open(file_path)
         text_parts = []
         total_chars = 0
+        pages_shown = 0
 
         for page_num in range(min(len(doc), max_pages)):
             page = doc[page_num]
@@ -97,16 +98,18 @@ def extract_pdf_text(file_path: str, max_pages: int = 3, max_chars: int = 30000)
                 remaining = max_chars - total_chars
                 if remaining > 100:
                     text_parts.append(f"--- Page {page_num + 1} ---\n{page_text[:remaining]}\n[...truncated...]")
+                    pages_shown += 1
                 break
 
             text_parts.append(f"--- Page {page_num + 1} ---\n{page_text}")
             total_chars += len(page_text)
+            pages_shown += 1
 
         total_pages = len(doc)
         doc.close()
 
-        if total_pages > max_pages:
-            text_parts.append(f"\n[Document has {total_pages} pages, showing first {max_pages}]")
+        if total_pages > pages_shown:
+            text_parts.append(f"\n[Document has {total_pages} pages, showing first {pages_shown}]")
 
         return "\n\n".join(text_parts)
     except Exception as e:

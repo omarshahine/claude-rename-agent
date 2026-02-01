@@ -20,7 +20,6 @@ from rich.spinner import Spinner
 from rich.style import Style
 
 from claude_agent_sdk import (
-    query,
     ClaudeAgentOptions,
     ClaudeSDKClient,
     tool,
