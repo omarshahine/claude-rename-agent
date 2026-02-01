@@ -35,6 +35,26 @@ console = Console()
 # Buffer size for large file handling (5MB)
 MAX_BUFFER_SIZE = 5 * 1024 * 1024
 
+# Tools available to the rename agent
+ALLOWED_TOOLS = [
+    # Built-in tools
+    "Read",
+    "Glob",
+    # Custom MCP tools
+    "mcp__rename__list_files",
+    "mcp__rename__analyze_file",
+    "mcp__rename__list_document_types",
+    "mcp__rename__get_patterns",
+    "mcp__rename__add_pattern",
+    "mcp__rename__learn_pattern",
+    "mcp__rename__preview_rename",
+    "mcp__rename__apply_rename",
+    "mcp__rename__apply_batch_rename",
+    "mcp__rename__apply_pattern",
+    "mcp__rename__get_rename_history",
+    "mcp__rename__get_pattern_stats",
+]
+
 from .tools.file_analyzer import (
     analyze_file,
     get_file_content,
@@ -158,7 +178,7 @@ async def tool_analyze_file(args: dict[str, Any]) -> dict[str, Any]:
 
     # Skip image for large files to avoid buffer issues
     file_size = result.get("file_info", {}).get("size", 0)
-    if result.get("image_base64") and file_size < 5_000_000:  # Only include image if file < 5MB
+    if result.get("image_base64") and file_size < MAX_BUFFER_SIZE:
         content.append({
             "type": "image",
             "source": {
@@ -469,24 +489,7 @@ async def run_rename_agent(
     options = ClaudeAgentOptions(
         system_prompt=SYSTEM_PROMPT,
         mcp_servers={"rename": mcp_server},
-        allowed_tools=[
-            # Built-in tools
-            "Read",
-            "Glob",
-            # Custom MCP tools
-            "mcp__rename__list_files",
-            "mcp__rename__analyze_file",
-            "mcp__rename__list_document_types",
-            "mcp__rename__get_patterns",
-            "mcp__rename__add_pattern",
-            "mcp__rename__learn_pattern",
-            "mcp__rename__preview_rename",
-            "mcp__rename__apply_rename",
-            "mcp__rename__apply_batch_rename",
-            "mcp__rename__apply_pattern",
-            "mcp__rename__get_rename_history",
-            "mcp__rename__get_pattern_stats",
-        ],
+        allowed_tools=ALLOWED_TOOLS,
         permission_mode=permission_mode,
         max_buffer_size=MAX_BUFFER_SIZE,
     )
@@ -527,22 +530,7 @@ async def run_interactive_session(
     options = ClaudeAgentOptions(
         system_prompt=SYSTEM_PROMPT,
         mcp_servers={"rename": mcp_server},
-        allowed_tools=[
-            "Read",
-            "Glob",
-            "mcp__rename__list_files",
-            "mcp__rename__analyze_file",
-            "mcp__rename__list_document_types",
-            "mcp__rename__get_patterns",
-            "mcp__rename__add_pattern",
-            "mcp__rename__learn_pattern",
-            "mcp__rename__preview_rename",
-            "mcp__rename__apply_rename",
-            "mcp__rename__apply_batch_rename",
-            "mcp__rename__apply_pattern",
-            "mcp__rename__get_rename_history",
-            "mcp__rename__get_pattern_stats",
-        ],
+        allowed_tools=ALLOWED_TOOLS,
         permission_mode=permission_mode,
         max_buffer_size=MAX_BUFFER_SIZE,
     )
