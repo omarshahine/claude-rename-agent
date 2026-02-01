@@ -69,20 +69,43 @@ from .models.document import DocumentType
 
 @tool(
     "list_files",
-    "List files in a directory. Can filter by extension and scan recursively.",
+    "List files in a directory. Can filter by extension and scan recursively. The directory parameter is REQUIRED.",
     {
-        "directory": str,
-        "extensions": list,  # Optional: [".pdf", ".jpg"]
-        "recursive": bool,   # Optional: default False
+        "type": "object",
+        "properties": {
+            "directory": {
+                "type": "string",
+                "description": "The full path to the directory to scan. REQUIRED."
+            },
+            "extensions": {
+                "type": "array",
+                "items": {"type": "string"},
+                "description": "Optional list of extensions to filter (e.g., ['.pdf', '.jpg'])"
+            },
+            "recursive": {
+                "type": "boolean",
+                "description": "Whether to scan subdirectories. Defaults to false."
+            }
+        },
+        "required": ["directory"]
     }
 )
 async def tool_list_files(args: dict[str, Any]) -> dict[str, Any]:
     """List files in a directory."""
-    directory = args.get("directory", ".")
+    directory = args.get("directory")
+    if not directory:
+        return {"content": [{"type": "text", "text": "Error: directory parameter is required"}], "is_error": True}
+
     extensions = args.get("extensions")
     recursive = args.get("recursive", False)
 
     files = list_files_in_directory(directory, extensions, recursive)
+
+    if not files:
+        return {"content": [{"type": "text", "text": f"No files found in: {directory}"}]}
+
+    if files and "error" in files[0]:
+        return {"content": [{"type": "text", "text": f"Error: {files[0]['error']}"}], "is_error": True}
 
     return {
         "content": [{
@@ -94,8 +117,17 @@ async def tool_list_files(args: dict[str, Any]) -> dict[str, Any]:
 
 @tool(
     "analyze_file",
-    "Analyze a file to extract content and metadata. Works with PDFs, images, and text files.",
-    {"file_path": str}
+    "Analyze a file to extract content and metadata. Works with PDFs, images, and text files. Returns first 2 pages of text for PDFs.",
+    {
+        "type": "object",
+        "properties": {
+            "file_path": {
+                "type": "string",
+                "description": "The full path to the file to analyze. REQUIRED."
+            }
+        },
+        "required": ["file_path"]
+    }
 )
 async def tool_analyze_file(args: dict[str, Any]) -> dict[str, Any]:
     """Analyze a single file."""
@@ -105,16 +137,26 @@ async def tool_analyze_file(args: dict[str, Any]) -> dict[str, Any]:
 
     result = analyze_file(file_path)
 
+    if "error" in result:
+        return {"content": [{"type": "text", "text": f"Error: {result['error']}"}], "is_error": True}
+
     # Return text content and/or image for Claude to analyze
     content = []
 
     if result.get("text_content"):
+        # Limit text content to avoid buffer issues (max 50KB)
+        text = result["text_content"]
+        if len(text) > 50000:
+            text = text[:50000] + "\n\n[...truncated due to size...]"
+
         content.append({
             "type": "text",
-            "text": f"File: {result['file_info']['name']}\nType: {result['content_type']}\n\nContent:\n{result['text_content']}"
+            "text": f"File: {result['file_info']['name']}\nType: {result['content_type']}\n\nContent:\n{text}"
         })
 
-    if result.get("image_base64"):
+    # Skip image for large files to avoid buffer issues
+    file_size = result.get("file_info", {}).get("size", 0)
+    if result.get("image_base64") and file_size < 5_000_000:  # Only include image if file < 5MB
         content.append({
             "type": "image",
             "source": {
@@ -444,19 +486,22 @@ async def run_rename_agent(
             "mcp__rename__get_pattern_stats",
         ],
         permission_mode=permission_mode,
+        max_buffer_size=5 * 1024 * 1024,  # 5MB buffer for large files
     )
 
-    # Run the agent
-    async for message in query(prompt=prompt, options=options):
-        if isinstance(message, AssistantMessage):
-            for block in message.content:
-                if isinstance(block, TextBlock):
-                    # Render markdown for rich text output
-                    console.print(Markdown(block.text))
-                elif isinstance(block, ToolUseBlock):
-                    # Styled tool usage indicator
-                    tool_name = block.name.replace("mcp__rename__", "")
-                    console.print(f"  [dim]●[/dim] [green]{tool_name}[/green]", end=" ")
+    # Run the agent using ClaudeSDKClient (required for MCP server support)
+    async with ClaudeSDKClient(options=options) as client:
+        await client.query(prompt)
+        async for message in client.receive_response():
+            if isinstance(message, AssistantMessage):
+                for block in message.content:
+                    if isinstance(block, TextBlock):
+                        # Render markdown for rich text output
+                        console.print(Markdown(block.text))
+                    elif isinstance(block, ToolUseBlock):
+                        # Styled tool usage indicator
+                        tool_name = block.name.replace("mcp__rename__", "")
+                        console.print(f"  [dim]●[/dim] [green]{tool_name}[/green]", end=" ")
 
 
 async def run_interactive_session(
@@ -497,6 +542,7 @@ async def run_interactive_session(
             "mcp__rename__get_pattern_stats",
         ],
         permission_mode=permission_mode,
+        max_buffer_size=5 * 1024 * 1024,  # 5MB buffer for large files
     )
 
     async with ClaudeSDKClient(options=options) as client:

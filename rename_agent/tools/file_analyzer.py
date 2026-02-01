@@ -69,12 +69,13 @@ def get_file_info(file_path: str) -> dict[str, Any]:
     }
 
 
-def extract_pdf_text(file_path: str, max_pages: int = 5) -> str:
+def extract_pdf_text(file_path: str, max_pages: int = 3, max_chars: int = 30000) -> str:
     """Extract text from a PDF file.
 
     Args:
         file_path: Path to PDF file
-        max_pages: Maximum number of pages to extract (for large documents)
+        max_pages: Maximum number of pages to extract (3 is sufficient for renaming)
+        max_chars: Maximum characters to return (default 30KB)
 
     Returns:
         Extracted text content
@@ -85,15 +86,27 @@ def extract_pdf_text(file_path: str, max_pages: int = 5) -> str:
     try:
         doc = fitz.open(file_path)
         text_parts = []
+        total_chars = 0
 
         for page_num in range(min(len(doc), max_pages)):
             page = doc[page_num]
-            text_parts.append(f"--- Page {page_num + 1} ---\n{page.get_text()}")
+            page_text = page.get_text()
 
+            # Check if we're exceeding the character limit
+            if total_chars + len(page_text) > max_chars:
+                remaining = max_chars - total_chars
+                if remaining > 100:
+                    text_parts.append(f"--- Page {page_num + 1} ---\n{page_text[:remaining]}\n[...truncated...]")
+                break
+
+            text_parts.append(f"--- Page {page_num + 1} ---\n{page_text}")
+            total_chars += len(page_text)
+
+        total_pages = len(doc)
         doc.close()
 
-        if len(doc) > max_pages:
-            text_parts.append(f"\n[...truncated, {len(doc) - max_pages} more pages]")
+        if total_pages > max_pages:
+            text_parts.append(f"\n[Document has {total_pages} pages, showing first {max_pages}]")
 
         return "\n\n".join(text_parts)
     except Exception as e:
