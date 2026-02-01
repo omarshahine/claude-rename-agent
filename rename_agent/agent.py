@@ -32,6 +32,9 @@ from claude_agent_sdk import (
 # Rich console for styled output
 console = Console()
 
+# Buffer size for large file handling (5MB)
+MAX_BUFFER_SIZE = 5 * 1024 * 1024
+
 from .tools.file_analyzer import (
     analyze_file,
     get_file_content,
@@ -485,7 +488,7 @@ async def run_rename_agent(
             "mcp__rename__get_pattern_stats",
         ],
         permission_mode=permission_mode,
-        max_buffer_size=5 * 1024 * 1024,  # 5MB buffer for large files
+        max_buffer_size=MAX_BUFFER_SIZE,
     )
 
     # Run the agent using ClaudeSDKClient (required for MCP server support)
@@ -541,7 +544,7 @@ async def run_interactive_session(
             "mcp__rename__get_pattern_stats",
         ],
         permission_mode=permission_mode,
-        max_buffer_size=5 * 1024 * 1024,  # 5MB buffer for large files
+        max_buffer_size=MAX_BUFFER_SIZE,
     )
 
     async with ClaudeSDKClient(options=options) as client:
