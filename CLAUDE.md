@@ -118,6 +118,13 @@ pip3.11 install -e .
 python3.11 -m pytest
 ```
 
+## Code Hygiene
+
+- No hardcoded user paths (`/Users/[name]/`) - use `~/` or `${HOME}`
+- No personal email addresses in tracked files (allowed: `@example.com`, `@anthropic.com`, `@noreply`)
+- No API keys or secrets in code - use environment variables
+- No phone numbers or PII in examples - use generic placeholders
+
 ## Dependencies
 
 - Python 3.10+
