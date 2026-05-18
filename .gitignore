@@ -40,3 +40,6 @@ ENV/
 
 # Project specific
 # User data is stored in ~/.rename-agent/ not in repo
+
+# Clawpatch local review state
+.clawpatch/
