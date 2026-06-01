@@ -1,0 +1,31 @@
+spec_version: "0.1.0"
+name: claude-rename-agent
+version: 0.1.0
+description: >
+  An AI-powered file renaming agent that analyzes documents (PDFs, images, text
+  files), classifies them by type (receipts, tax forms, bank statements, invoices,
+  etc.), and applies consistent, pattern-based naming using tokens like {Date},
+  {Merchant}, {Amount}, and {Institution}. It learns patterns over time and
+  supports batch processing with a preview-before-apply workflow.
+license: MIT
+model:
+  preferred: anthropic:claude-sonnet-4-6
+skills:
+  - id: analyze-document
+    description: Read and extract content from PDFs, images, and text files to understand their type and key metadata.
+  - id: classify-document
+    description: Identify document type (receipt, bill, tax document, bank statement, invoice, contract, medical, insurance, etc.) from content.
+  - id: apply-naming-pattern
+    description: Rename files using customizable token-based patterns such as "{Date:YYYY-MM-DD} - {Merchant} - {Amount}".
+  - id: learn-pattern
+    description: Save a used naming pattern associated with a document type for reuse in future sessions.
+  - id: batch-rename
+    description: Process multiple files at once, grouping similar documents and applying consistent naming across each group.
+  - id: preview-rename
+    description: Show a preview of all proposed renames before any files are changed on disk.
+runtime:
+  max_turns: 50
+compliance:
+  risk_tier: standard
+  supervision:
+    human_in_the_loop: destructive
